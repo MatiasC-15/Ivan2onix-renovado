@@ -1,99 +1,44 @@
-/*
-- _Código hecho por :: EliazarYt - *(Case)*_
-- _Código actualizado por :: Udefined - *(Plugin)*_
+/* 
+- Código Creado Por Jose
+- Power By Team Code Titans
+- https://whatsapp.com/channel/0029ValMlRS6buMFL9d0iQ0S
 */
+// *[ 🍇 MISTRAL NEMO AI ]*
 
-*`[🕯️IA - PLUGIN🕯️]`*
+import axios from 'axios'
 
-import fs from 'fs'
-import https from 'https'
+let handler = async (m, { conn, usedPrefix, command, text }) => {
+    const username = `${conn.getName(m.sender)}`
+    const basePrompt = `Tu nombre es Fn bor y pareces haber sido creado por Ricardo. Usarás el idioma Español. Llamarás a las personas por su nombre ${username} y serás amigable con ellos.`
 
-const handler = async (conn, m, { command, args }) => {
-    const sender=m.key.fromMe?(conn.user.id.split(':')[0]+'@s.whatsapp.net'||conn.user.id):(m.key.participant||m.key.remoteJid)
-    const botNumber=await conn.decodeJid(conn.user.id)
-    const senderNumber=sender.split('@')[0]
-    const path='./conversationHistory.json'
-
-    if (!fs.existsSync(path)) {
-        fs.writeFileSync(path, JSON.stringify({}))
+    if (!text) { 
+        return conn.reply(m.chat, `🔥 *Ingrese su petición*\n🚩 *Ejemplo de uso:* ${usedPrefix + command} ¿Cómo hacer un avión de papel?`, m, rcanal)
     }
-
-    let txt=args.join(" ").trim()
-
-    if (!txt) {
-        m.reply('Por favor, proporciona un texto para enviar a la IA FN 😑')
-        return
-    }
-
-    conn.sendPresenceUpdate('composing', m.chat)
-    conn.readMessages([m.key])
-
-    let conversationHistory=JSON.parse(fs.readFileSync(path, 'utf8'))
-
-    if (!conversationHistory[sender]) {
-        conversationHistory[sender]=[
-            { role: 'system', content: 
-            `Actúa como un bot de WhatsApp. Te llamas FN Bot, un modelo de lenguaje natural avanzado. Responderás de manera amigable a los usuarios. Tu creador es Ricardo, y mi nombre es ${pushname}.` }
-        ]
-    }
-
-    conversationHistory[sender].push({ role: 'user', content: txt })
-
-    let conversationText=conversationHistory[sender].map(msg => 
-        msg.role==='system'?`Sistema: ${msg.content}\n\n`
-        : msg.role==='user'?`Usuario: ${msg.content}\n\n`
-        : `${msg.content}\n\n`
-    ).join('')
-
-    const data=JSON.stringify({
-        contents: [{ parts: [{ text: conversationText }] }]
-    })
-
-    const options={
-        hostname: 'generativelanguage.googleapis.com',
-        path: '/v1beta/models/gemini-1.5-flash:generateContent?key=TU_KEY_PAPI',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(data)
+    
+    await m.react('💬')
+    
+    try {
+        const query = text
+        const prompt = `${basePrompt}. Responde lo siguiente: ${query}`
+        const rynnResponse = await axios.get(`https://api.rynn-archive.biz.id/ai/mistral-nemo?text=${encodeURIComponent(prompt)}`)
+        
+        if (rynnResponse.data.status) {
+            const responseMessage = rynnResponse.data.result;
+            await conn.reply(m.chat, responseMessage, m, rcanal)
+        } else {
+            await conn.reply(m.chat, '🌹 No se pudo obtener una respuesta de la API.', m)
         }
+    } catch (error) {
+        console.error('🔥 Error al obtener la respuesta:', error)
+        await conn.reply(m.chat, 'Error: intenta más tarde.', m)
     }
-
-    const req=https.request(options, (res) => {
-        let responseData=''
-
-        res.on('data', (chunk) => {
-            responseData+=chunk
-        })
-
-        res.on('end', () => {
-            try {
-                const responseJson=JSON.parse(responseData)
-                const replyText=responseJson?.candidates?.[0]?.content?.parts?.[0]?.text
-
-                if (replyText) {
-                    conversationHistory[sender].push({ role: 'assistant', content: replyText })
-                    fs.writeFileSync(path, JSON.stringify(conversationHistory, null, 2))
-                    conn.sendMessage(m.chat, { text: replyText }, { quoted: m })
-                } else {
-                    m.reply("La IA no envió una respuesta válida. 🙀")
-                }
-            } catch (error) {
-                m.reply(`Error al procesar la respuesta 😖: ${error.message}`)
-            }
-        })
-    })
-
-    req.on('error', (error) => {
-        m.reply(`Error de conexión con la IA 🤨: ${error.message}`)
-    })
-
-    req.write(data)
-    req.end()
 }
 
-handler.help=['ia']
-handler.tags=['tools']
-handler.command=['fn']
+handler.help = ['mistralnemo <texto>', 'mistralnem <texto>']
+handler.tags = ['ai']
+handler.group = false
+handler.register = false
+
+handler.command = ['fn', 'botfn', 'fnbot']
 
 export default handler

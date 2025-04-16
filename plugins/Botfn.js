@@ -1,44 +1,24 @@
 /* 
-- Código Creado Por Jose
+- Código Creado Por Izumi-kzx
 - Power By Team Code Titans
 - https://whatsapp.com/channel/0029ValMlRS6buMFL9d0iQ0S
 */
-// *[ 🍇 MISTRAL NEMO AI ]*
+// *[ 🍨 LILYCHAN AI ]*
+import fetch from 'node-fetch'
 
-import axios from 'axios'
-
-let handler = async (m, { conn, usedPrefix, command, text }) => {
-    const username = `${conn.getName(m.sender)}`
-    const basePrompt = `Tu nombre es Fn bor y pareces haber sido creado por Ricardo. Usarás el idioma Español. Llamarás a las personas por su nombre ${username} y serás amigable con ellos.`
-
-    if (!text) { 
-        return conn.reply(m.chat, `🔥 *Ingrese su petición*\n🚩 *Ejemplo de uso:* ${usedPrefix + command} ¿Cómo hacer un avión de papel?`, m, rcanal)
-    }
-    
-    await m.react('💬')
-    
-    try {
-        const query = text
-        const prompt = `${basePrompt}. Responde lo siguiente: ${query}`
-        const rynnResponse = await axios.get(`https://api.rynn-archive.biz.id/ai/mistral-nemo?text=${encodeURIComponent(prompt)}`)
-        
-        if (rynnResponse.data.status) {
-            const responseMessage = rynnResponse.data.result;
-            await conn.reply(m.chat, responseMessage, m, rcanal)
-        } else {
-            await conn.reply(m.chat, '🌹 No se pudo obtener una respuesta de la API.', m)
-        }
-    } catch (error) {
-        console.error('🔥 Error al obtener la respuesta:', error)
-        await conn.reply(m.chat, 'Error: intenta más tarde.', m)
-    }
-}
-
-handler.help = ['mistralnemo <texto>', 'mistralnem <texto>']
-handler.tags = ['ai']
-handler.group = false
-handler.register = false
-
-handler.command = ['fn', 'botfn', 'fnbot']
+let handler=async(m,{conn,text})=>{
+if(!text)return conn.reply(m.chat,`🌸 Ingresa un texto para hablar con Fnbot`,m)
+try{
+let api=await fetch(`https://archive-ui.tanakadomp.biz.id/ai/lilychan?text=${encodeURIComponent(text)}`)
+let json=await api.json()
+if(json.status&&json.result)await m.reply(json.result.message)
+else await m.reply(`🌸 Hubo un error al obtener la respuesta.`)
+}catch(error){
+console.error(error)
+await m.reply(`🌸 Ocurrió un error al procesar tu solicitud.`)
+}}
+handler.help=['lilychan *<texto>*']
+handler.tags=['ai']
+handler.command=['fnbot']
 
 export default handler

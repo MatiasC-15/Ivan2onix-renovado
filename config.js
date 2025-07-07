@@ -11,7 +11,9 @@ global.confirmCode = ''
 
 //• ↳𝑺𝑶𝑳𝑶 𝑫𝑬𝑺𝑨𝑹𝑹𝑶𝑳𝑳𝑨𝑫𝑶𝑹𝑬𝑺 𝑨𝑷𝑹𝑶𝑩𝑨𝑫𝑶𝑺
 global.owner = [
+// <-- Número @s.whatsapp.net -->
 ['593979133620', '𝐂𝐫𝐞𝐚𝐝𝐨𝐫 🧑‍💻', true],
+// <-- Número @lid -->
 ['59169739411']
 ];
 
